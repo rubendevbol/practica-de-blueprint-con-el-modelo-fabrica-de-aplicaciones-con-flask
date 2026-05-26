@@ -8,4 +8,4 @@ class Tarea(db.Model):
     completado = db.Column(db.Boolean,nullable=False)
     
     def __repr__(self):
-        return f"<TAREA: {self.descripcion} - {self.completado}"
+        return f"<TAREA: {self.descripcion} - {self.completado}>"

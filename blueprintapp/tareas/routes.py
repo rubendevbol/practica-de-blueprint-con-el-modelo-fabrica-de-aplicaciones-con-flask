@@ -1,5 +1,5 @@
 # Librerias a usar en el modulo
-from flask import request,render_template,redirect,url_for,Blueprint
+from flask import request, render_template, redirect, url_for, Blueprint, flash
 
 # Referencia a la base de datos
 from blueprintapp.app import db
@@ -17,17 +17,49 @@ def index():
 def create():
     if request.method == 'GET':
         return render_template('tareas/create.html')
-    elif request.method == 'POST':
-        descripcion = request.form.get('descripcion')
-        completado = True if 'completado' in request.form.keys() else False
-        # Crear un objeto miembro
-        tarea = Tarea(descripcion=descripcion,completado=completado)
-        # Insertar en la bd a traves del ORM
-        db.session.add(tarea)
-        db.session.commit()
-        # Redireccion al listado de miembros
-        return redirect(url_for('bp_tarea.index'))
-        
-        
+    descripcion = request.form.get('descripcion', '').strip()
+    completado = 'completado' in request.form.keys()
+
+    if not descripcion:
+        flash('Debes completar la descripción para crear la tarea.', 'warning')
+        return render_template('tareas/create.html', descripcion=descripcion, completado=completado), 400
+
+    tarea = Tarea(descripcion=descripcion, completado=completado)
+    db.session.add(tarea)
+    db.session.commit()
+    flash('Tarea creada correctamente.', 'success')
+    return redirect(url_for('bp_tarea.index'))
+
+
+@bp_tarea.route("/editar/<int:id>", methods=["GET", "POST"])
+def edit(id):
+    tarea = Tarea.query.get_or_404(id)
+
+    if request.method == 'GET':
+        return render_template('tareas/edit.html', tarea=tarea)
+
+    descripcion = request.form.get('descripcion', '').strip()
+    completado = 'completado' in request.form.keys()
+
+    if not descripcion:
+        flash('Debes completar la descripción para actualizar la tarea.', 'warning')
+        return render_template('tareas/edit.html', tarea=tarea), 400
+
+    tarea.descripcion = descripcion
+    tarea.completado = completado
+    db.session.commit()
+    flash('Tarea actualizada correctamente.', 'success')
+    return redirect(url_for('bp_tarea.index'))
+
+
+@bp_tarea.route("/eliminar/<int:id>", methods=["POST"])
+def delete(id):
+    tarea = Tarea.query.get_or_404(id)
+    db.session.delete(tarea)
+    db.session.commit()
+    flash('Tarea eliminada correctamente.', 'success')
+    return redirect(url_for('bp_tarea.index'))
+
+
 
 

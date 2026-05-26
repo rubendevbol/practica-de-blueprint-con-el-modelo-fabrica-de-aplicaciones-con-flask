@@ -9,6 +9,7 @@ def create_app():
     app = Flask(__name__, template_folder='templates')
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bd_equipo.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.secret_key ="holabb"
     
     db.init_app(app)
     migrate.init_app(app,db)
