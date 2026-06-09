@@ -18,12 +18,26 @@
                         <label class="form-label" for="descripcion">Descripción</label>
                         <input class="form-control form-control-lg" type="text" id="descripcion" name="descripcion" placeholder="Describe la tarea" value="{{ descripcion or '' }}" required>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="miembro_id">Miembro</label>
+                        <select class="form-select form-select-lg" id="miembro_id" name="miembro_id" required>
+                            <option value="">Selecciona un miembro</option>
+                            {% for item in miembros %}
+                                <option value="{{ item.id }}" {% if miembro_id == item.id %}selected{% endif %}>{{ item.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                     <div class="form-check mb-4">
                         <input class="form-check-input" type="checkbox" id="completado" name="completado" {% if completado %}checked{% endif %}>
                         <label class="form-check-label" for="completado">Marcar como completada</label>
                     </div>
+                    {% if not miembros %}
+                    <div class="alert alert-warning">
+                        Primero debes crear miembros para poder registrar tareas.
+                    </div>
+                    {% endif %}
                     <div class="d-flex gap-2">
-                        <button class="btn btn-primary btn-lg" type="submit">Guardar</button>
+                        <button class="btn btn-primary btn-lg" type="submit" {% if not miembros %}disabled{% endif %}>Guardar</button>
                         <a class="btn btn-light btn-lg" href="{{ url_for('bp_tarea.index') }}">Cancelar</a>
                     </div>
                 </form>
